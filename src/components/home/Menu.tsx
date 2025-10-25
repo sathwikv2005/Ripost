@@ -16,7 +16,11 @@ export default function Menu() {
 					</Link>
 				</div>
 				<div>
-					<Link to="/about" className={`${styles.item} creepster`}>
+					<Link
+						to="https://github.com/sathwikv2005"
+						target="_blank"
+						className={`${styles.item} creepster`}
+					>
 						About
 					</Link>
 				</div>
