@@ -1,5 +1,5 @@
 :root {
-	--primary: #121117;
+	--primary: #1e1e1e;
 	--text: #ffffff;
 	--yellow: #feca28;
 	--yellow-light: #ffec86;
@@ -9,6 +9,7 @@
 	--green-dark: #2a9134;
 	--dark-blue: #025c82;
 	--orange: #f79f33;
+	--peach: #feeac7;
 }
 
 /* fonts */
@@ -36,4 +37,11 @@
 	color: var(--text);
 	background-color: var(--primary);
 	font-family: 'Poppins', sans-serif;
+}
+
+#root {
+	width: 100vw;
+	width: 100dvw;
+	height: 100vh;
+	height: 100dvh;
 }
