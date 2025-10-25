@@ -1,0 +1,39 @@
+:root {
+	--primary: #121117;
+	--text: #ffffff;
+	--yellow: #feca28;
+	--yellow-light: #ffec86;
+	--yellow-dark: #f0cb50;
+	--green: #3cbc3c;
+	--green-light: #9be64d;
+	--green-dark: #2a9134;
+	--dark-blue: #025c82;
+	--orange: #f79f33;
+}
+
+/* fonts */
+.poppins {
+	font-family: 'Poppins', sans-serif;
+}
+.ubuntu {
+	font-family: 'Ubuntu', sans-serif;
+}
+.big-shoulders {
+	font-family: 'Big Shoulders', sans-serif;
+}
+.big-shoulders-stencil {
+	font-family: 'Big Shoulders Stencil', sans-serif;
+}
+.creepster {
+	font-family: 'Creepster', sans-serif;
+}
+/**/
+
+* {
+	margin: 0;
+	padding: 0;
+	text-decoration: none;
+	color: var(--text);
+	background-color: var(--primary);
+	font-family: 'Poppins', sans-serif;
+}
