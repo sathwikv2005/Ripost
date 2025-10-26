@@ -1,15 +1,17 @@
 :root {
 	--primary: #1e1e1e;
 	--text: #ffffff;
+	--gray: #2f2c36;
 	--yellow: #feca28;
-	--yellow-light: #ffec86;
+	--yellow-light: #fff2b0;
 	--yellow-dark: #f0cb50;
 	--green: #3cbc3c;
 	--green-light: #9be64d;
 	--green-dark: #2a9134;
-	--dark-blue: #025c82;
+	--dark-blue: #0079ad;
 	--orange: #f79f33;
 	--peach: #feeac7;
+	--yellow-brown: #b8860b;
 }
 
 /* fonts */
@@ -34,8 +36,6 @@
 	margin: 0;
 	padding: 0;
 	text-decoration: none;
-	color: var(--text);
-	background-color: var(--primary);
 	font-family: 'Poppins', sans-serif;
 }
 
@@ -44,4 +44,6 @@
 	width: 100dvw;
 	height: 100vh;
 	height: 100dvh;
+	color: var(--text);
+	background-color: var(--primary);
 }
