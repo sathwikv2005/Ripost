@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, type ReactNode } from 'react'
 import styles from './Window.module.css'
 import { BiWindowClose } from 'react-icons/bi'
 import { TbArrowBigRightFilled, TbArrowBigLeftFilled } from 'react-icons/tb'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 interface arrayItem {
 	item: ReactNode
@@ -16,6 +16,8 @@ interface WindowProps {
 export default function Window({ array }: WindowProps) {
 	const [index, setIndex] = useState(0)
 	const boxRef = useRef<HTMLDivElement>(null)
+
+	const naviagte = useNavigate()
 
 	function next() {
 		if (index === array.length - 1) return
@@ -31,6 +33,17 @@ export default function Window({ array }: WindowProps) {
 		if (boxRef.current) {
 			boxRef.current.scrollTo({ top: 0, behavior: 'smooth' })
 		}
+	}, [index])
+
+	useEffect(() => {
+		function handleKeyDown(e: KeyboardEvent) {
+			if (e.key === 'ArrowRight' || e.key === 'ArrowUp') next()
+			else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') back()
+			else if (e.key === 'Escape') naviagte('/')
+		}
+
+		window.addEventListener('keydown', handleKeyDown)
+		return () => window.removeEventListener('keydown', handleKeyDown)
 	}, [index])
 
 	return (
