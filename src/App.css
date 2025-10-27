@@ -12,6 +12,7 @@
 	--orange: #f79f33;
 	--peach: #feeac7;
 	--yellow-brown: #b8860b;
+	--red-dark: #c95729;
 }
 
 /* fonts */
@@ -39,6 +40,7 @@
 	font-family: 'Poppins', sans-serif;
 }
 
+body,
 #root {
 	width: 100vw;
 	width: 100dvw;

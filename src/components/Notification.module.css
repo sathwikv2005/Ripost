@@ -1,0 +1,43 @@
+.noti {
+	position: absolute;
+	top: 20px;
+	right: 10px;
+	justify-self: flex-end;
+	background-color: var(--yellow-dark);
+	color: var(--primary);
+	box-shadow: 0 0 15px var(--orange);
+	border-radius: 10px;
+	width: 400px;
+	max-width: 80vw;
+	min-height: 75px;
+	z-index: 1000;
+	font-family: 'Poppins', sans-serif;
+	animation: slide 0.5s ease-out;
+}
+
+.close {
+	animation: slideOut 0.5s ease-out forwards;
+}
+
+@keyframes slide {
+	from {
+		opacity: 0;
+		transform: translateX(150%);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes slideOut {
+	from {
+		opacity: 1;
+		transform: translateX(0);
+	}
+	to {
+		opacity: 0;
+		display: none;
+		transform: translateX(150%);
+	}
+}
