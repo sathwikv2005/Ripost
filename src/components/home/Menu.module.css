@@ -1,12 +1,11 @@
 .menu {
-	margin-top: 10vh;
+	margin-top: 8vh;
 	display: flex;
 	align-self: center;
 	justify-self: center;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	gap: 20px;
 
 	opacity: 0;
 	animation: slideDown 1s ease-out forwards;
@@ -15,6 +14,12 @@
 }
 
 .item {
+	display: flex;
+	text-align: center;
+	justify-content: center;
+	align-items: center;
+	height: 100px;
+	width: 250px;
 	font-size: 42px;
 	color: var(--orange);
 	text-shadow: -4px 6px 2px rgba(0, 0, 0, 0.5);
@@ -29,8 +34,9 @@
 }
 
 .menu > div:hover {
-	transform: scale(1.03) translateY(-2px);
-	animation: flicker 0.5s infinite;
+	background-image: url('../../assets/stroke.png');
+	background-size: cover;
+	background-position: center;
 }
 
 @keyframes slideDown {
