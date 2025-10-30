@@ -1,0 +1,40 @@
+.container {
+	max-width: 600px;
+	z-index: 5;
+}
+
+.word {
+	width: 100%;
+	justify-content: center;
+	display: flex;
+	flex-direction: row;
+	animation: up 0.3s ease-in-out forwards;
+}
+
+.letter {
+	font-size: 32px;
+}
+
+.typo {
+	color: var(--red-dark);
+}
+
+.typed {
+	color: var(--yellow);
+}
+
+.timer {
+	height: 5px;
+	background-color: var(--peach);
+}
+
+@keyframes up {
+	0% {
+		opacity: 0;
+		transform: scale(0) translateY(-700px);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1) translateY(0);
+	}
+}

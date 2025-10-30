@@ -1,0 +1,49 @@
+.ui_bottom {
+	position: absolute;
+	bottom: 40px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+}
+
+.top {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.boss_name {
+	text-align: left;
+	font-size: 22px;
+	margin-bottom: 5px;
+	text-shadow: -4px 6px 2px rgba(0, 0, 0, 0.5);
+}
+
+.boss_health_bar {
+	display: flex;
+	border: 2px solid var(--red-dark);
+	flex-direction: row;
+	height: 20px;
+	width: 80vw;
+	max-width: 600px;
+	background-color: var(--primary);
+	border-radius: 25px;
+}
+
+.boss_health {
+	border-radius: 25px;
+	height: 100%;
+	width: 100%;
+	background-color: var(--health-red);
+}
+
+.boss_damage {
+	background-color: var(--yellow-dark);
+	margin-left: -7px;
+	border-radius: 0px 25px 25px 0px;
+	height: 100%;
+}
