@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, type ReactNode } from 'react'
 import styles from './Window.module.css'
-import { BiWindowClose } from 'react-icons/bi'
 import { TbArrowBigRightFilled, TbArrowBigLeftFilled } from 'react-icons/tb'
-import { Link, useNavigate } from 'react-router-dom'
+import { FaRegMinusSquare, FaRegWindowClose } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'
 
 interface arrayItem {
 	item: ReactNode
@@ -15,6 +15,7 @@ interface WindowProps {
 
 export default function Window({ array }: WindowProps) {
 	const [index, setIndex] = useState(0)
+	const [close, setClose] = useState(false)
 	const boxRef = useRef<HTMLDivElement>(null)
 
 	const naviagte = useNavigate()
@@ -27,6 +28,13 @@ export default function Window({ array }: WindowProps) {
 	function back() {
 		if (index === 0) return
 		setIndex(index - 1)
+	}
+
+	function closeHandle() {
+		setClose(true)
+		setTimeout(() => {
+			naviagte('/')
+		}, 450)
 	}
 
 	useEffect(() => {
@@ -48,12 +56,17 @@ export default function Window({ array }: WindowProps) {
 
 	return (
 		<div className={`${styles.container}`}>
-			<div className={`${styles.window}`}>
+			<div className={`${styles.window} ${close ? styles.minimise : ''}`}>
 				<div className={`${styles.bar}`}>
 					<div className={`${styles.title} creepster`}>Guide</div>
-					<Link to="/">
-						<BiWindowClose className={`${styles.icon} ${styles.close}`} />
-					</Link>
+					<div className={styles.btn_container}>
+						<div onClick={closeHandle}>
+							<FaRegMinusSquare className={`${styles.icon} ${styles.minus}`} />
+						</div>
+						<div onClick={closeHandle}>
+							<FaRegWindowClose className={`${styles.icon} ${styles.close}`} />
+						</div>
+					</div>
 				</div>
 				<div className={`${styles.box}`} ref={boxRef}>
 					<div className={`${styles.children}`}>{array[index].item}</div>
