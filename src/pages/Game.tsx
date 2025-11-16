@@ -14,12 +14,15 @@ export default function Game() {
 	const [damage, setDamage] = useState(0)
 	const [word, setWord] = useState<string | null>(null)
 	const [wordState, setWordState] = useState<'typing' | 'success' | 'fail' | null>(null)
+	const [gameState, setGameState] = useState<'starting' | 'playing' | 'complete'>('starting')
 	const [timer, setTimer] = useState(0)
 	const [timeRemaining, setTimeRemaining] = useState(0)
+	const [hit, setHit] = useState(false)
 
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 	const timerEndRef = useRef<number>(0)
+	const hitClearTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	const getRandomWord = () => {
 		const randomIndex = Math.floor(Math.random() * words.length)
@@ -31,12 +34,27 @@ export default function Game() {
 	}
 
 	function bossDamage(value: number) {
-		if (bossHealth <= 0) return //TODO: add win screen
+		if (bossHealth <= 0) return setGameState('complete')
+
 		setDamage((prev) => prev + value)
 		setBossHealth((prev) => {
+			if (prev - value <= 0) setGameState('complete') //TODO: add win screen
 			if (prev < value) return 0
 			return prev - value
 		})
+
+		setHit((prev) => {
+			if (!prev) {
+				if (hitClearTimeoutRef.current) clearTimeout(hitClearTimeoutRef.current)
+				hitClearTimeoutRef.current = setTimeout(() => {
+					setHit(false)
+					hitClearTimeoutRef.current = null
+				}, 1000)
+				return true
+			}
+			return prev
+		})
+
 		setTimeout(() => {
 			setDamage((prev) => prev - value)
 		}, 2000)
@@ -50,6 +68,19 @@ export default function Game() {
 	}
 
 	useEffect(() => {
+		setTimeout(() => setGameState('playing'), 2000)
+	}, [])
+
+	useEffect(() => {
+		if (gameState !== 'playing') {
+			if (timerRef.current) clearTimeout(timerRef.current)
+			if (intervalRef.current) clearInterval(intervalRef.current)
+			setWord(null)
+			setTimer(0)
+			setTimeRemaining(0)
+			setWordState(null)
+			return
+		}
 		if (timerRef.current) clearTimeout(timerRef.current)
 		if (intervalRef.current) clearInterval(intervalRef.current)
 
@@ -85,13 +116,13 @@ export default function Game() {
 			if (timerRef.current) clearTimeout(timerRef.current)
 			if (intervalRef.current) clearInterval(intervalRef.current)
 		}
-	}, [wordState])
+	}, [wordState, gameState])
 
 	return (
 		<div className={styles.gameContainer}>
 			<div className={styles.background}></div>
 
-			<Boss />
+			<Boss hit={hit || bossHealth === 0} />
 			<WordDisplay
 				word={word}
 				timerPercent={(timeRemaining / timer) * 100}

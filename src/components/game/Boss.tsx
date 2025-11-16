@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import styles from './Boss.module.css'
 
-export default function Boss() {
+export default function Boss({ hit }: { hit: boolean }) {
 	const [frame, setFrame] = useState(0)
 	// Sprite config
 	const totalFrames = 4
@@ -11,7 +11,6 @@ export default function Boss() {
 
 	const lastTime = useRef(0)
 	const requestRef = useRef<number | null>(null)
-
 	useEffect(() => {
 		const frameDuration = 1000 / fps
 
@@ -30,9 +29,9 @@ export default function Boss() {
 	}, [fps, totalFrames])
 	return (
 		<div
-			className={styles.boss}
+			className={`${styles.boss} ${hit ? styles.hit : ''}`}
 			style={{
-				backgroundImage: 'url(/boss.png)',
+				backgroundImage: hit ? `url(/boss_hit.png)` : `url(/boss.png)`,
 				backgroundRepeat: 'no-repeat',
 				backgroundPosition: `-${frame * frameWidth}px 0`,
 				backgroundSize: `${frameWidth * totalFrames}px ${frameHeight}px`,

@@ -21,6 +21,7 @@
 
 .typed {
 	color: var(--yellow);
+	scale: 1.2;
 }
 
 .timer {
