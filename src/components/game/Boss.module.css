@@ -1,6 +1,9 @@
 .boss {
 	z-index: 1;
 	animation: flicker 1s linear;
+	margin: auto;
+	justify-self: center;
+	align-self: center;
 }
 
 .hit {

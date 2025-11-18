@@ -1,11 +1,7 @@
 .gameContainer {
 	position: relative;
-	width: 100vw;
-	height: 100vh;
-	width: 100dvw;
-	height: 100dvh;
-	background: var(--primary);
 	overflow: hidden;
+	height: 72.5%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -23,4 +19,23 @@
 	background-size: cover;
 	background-position: center;
 	z-index: 0;
+}
+
+.container {
+	width: 100vw;
+	height: 100vh;
+	width: 100dvw;
+	height: 100dvh;
+	opacity: 1;
+	overflow: hidden;
+}
+
+.topUI {
+	height: 10%;
+	position: relative;
+	z-index: 5;
+}
+
+.startText {
+	font-size: 32px;
 }

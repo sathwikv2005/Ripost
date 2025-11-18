@@ -1,135 +1,221 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styles from './Game.module.css'
 import words from '../../words/words_9k.json'
+
 import UiBottom from '../components/game/UiBottom'
 import Boss from '../components/game/Boss'
 import WordDisplay from '../components/game/WordDisplay'
+import PlayerStats from '../components/game/PlayerStats'
+
+import bossTheme from '../assets/sfx/bossbgm.mp3'
+import bosshit from '../assets/sfx/bosshit.mp3'
+import wrong from '../assets/sfx/wrong.mp3'
+import keyPress from '../assets/sfx/keypress.mp3'
+import damageTaken from '../assets/sfx/damagetaken.mp3'
 
 export default function Game() {
+	//------------------------------------------------------
+	// CONSTANTS
+	//------------------------------------------------------
 	const baseTime = 1000
 	const timePerLetter = 500
 	const delayBetweenWords = 800
+	const burnStatusRounds = 2
+	const damageFromFire = 15
+	const damageFromBurns = 5
 
+	//------------------------------------------------------
+	// GAME STATE
+	//------------------------------------------------------
 	const [bossHealth, setBossHealth] = useState(100)
+	const [playerHealth, setPlayerHealth] = useState(100)
 	const [damage, setDamage] = useState(0)
+	const [damagePlayer, setDamagePlayer] = useState(0)
+
 	const [word, setWord] = useState<string | null>(null)
 	const [wordState, setWordState] = useState<'typing' | 'success' | 'fail' | null>(null)
 	const [gameState, setGameState] = useState<'starting' | 'playing' | 'complete'>('starting')
-	const [timer, setTimer] = useState(0)
-	const [timeRemaining, setTimeRemaining] = useState(0)
-	const [hit, setHit] = useState(false)
 
-	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-	const timerEndRef = useRef<number>(0)
-	const hitClearTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const [showBoss, setShowBoss] = useState(false)
+	const [burnStatus, setBurnStatus] = useState(0)
+	const [comboStatus, setComboStatus] = useState(0)
 
+	const [timeToType, setTimeToType] = useState(0)
+
+	const hitClearRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+	//------------------------------------------------------
+	// SOUND
+	//------------------------------------------------------
+	const bossHitSound = useRef(new Audio(bosshit))
+	const bossThemeSound = useRef(new Audio(bossTheme))
+	const keyPressSound = useRef(new Audio(keyPress))
+	const wrongSound = useRef(new Audio(wrong))
+	const damageTakenSound = useRef(new Audio(damageTaken))
+
+	//------------------------------------------------------
+	// HELPERS
+	//------------------------------------------------------
 	const getRandomWord = () => {
 		const randomIndex = Math.floor(Math.random() * words.length)
 		return words[randomIndex].toLowerCase()
 	}
 
 	function handleTypo() {
-		setWordState('fail')
+		wrongSound.current.currentTime = 0
+		wrongSound.current.volume = 0.3
+		wrongSound.current.play()
 	}
 
+	function handleKeyPress() {
+		keyPressSound.current.currentTime = 0
+		keyPressSound.current.volume = 0.3
+		keyPressSound.current.play()
+	}
+
+	function playDamageTaken() {
+		damageTakenSound.current.currentTime = 0
+		damageTakenSound.current.volume = 0.3
+		damageTakenSound.current.play()
+	}
+
+	//------------------------------------------------------
+	// BOSS DAMAGE
+	//------------------------------------------------------
 	function bossDamage(value: number) {
 		if (bossHealth <= 0) return setGameState('complete')
 
-		setDamage((prev) => prev + value)
+		bossHitSound.current.currentTime = 0
+		bossHitSound.current.volume = 0.3
+		bossHitSound.current.play()
+
+		setDamage((d) => d + value)
 		setBossHealth((prev) => {
-			if (prev - value <= 0) setGameState('complete') //TODO: add win screen
-			if (prev < value) return 0
-			return prev - value
+			if (prev - value <= 0) setGameState('complete')
+			return Math.max(prev - value, 0)
 		})
 
-		setHit((prev) => {
-			if (!prev) {
-				if (hitClearTimeoutRef.current) clearTimeout(hitClearTimeoutRef.current)
-				hitClearTimeoutRef.current = setTimeout(() => {
-					setHit(false)
-					hitClearTimeoutRef.current = null
-				}, 1000)
-				return true
-			}
-			return prev
-		})
+		if (!hitClearRef.current) {
+			hitClearRef.current = setTimeout(() => {
+				setHit(false)
+				hitClearRef.current = null
+			}, 1000)
+		}
+		setHit(true)
 
-		setTimeout(() => {
-			setDamage((prev) => prev - value)
-		}, 2000)
+		setTimeout(() => setDamage((d) => d - value), 2000)
 	}
+
+	//------------------------------------------------------
+	// WORD RESULT
+	//------------------------------------------------------
+	const [hit, setHit] = useState(false)
 
 	function handleSetWordState(state: 'typing' | 'success' | 'fail' | null) {
 		if (word && state === 'success') {
+			setComboStatus((c) => c + 1)
+
+			if (burnStatus > 0) {
+				playDamageTaken()
+				setPlayerHealth((h) => Math.max(h - damageFromBurns, 0))
+
+				setDamagePlayer((d) => d + damageFromBurns)
+				setTimeout(() => setDamagePlayer((d) => d - damageFromBurns), 2000)
+
+				setBurnStatus((b) => b - 1)
+			}
+
 			bossDamage(word.length)
 		}
+
+		if (word && state === 'fail') {
+			let total = damageFromFire
+
+			if (burnStatus > 0) {
+				total += damageFromBurns
+				setBurnStatus((b) => b - 1)
+			}
+
+			setPlayerHealth((h) => Math.max(h - total, 0))
+			setDamagePlayer((d) => d + total)
+			setTimeout(() => setDamagePlayer((d) => d - total), 2000)
+
+			playDamageTaken()
+			addBurnStatus()
+			setComboStatus(0)
+		}
+
 		setWordState(state)
 	}
 
+	function addBurnStatus(rounds: number = burnStatusRounds) {
+		setBurnStatus((b) => b + rounds)
+	}
+
+	//------------------------------------------------------
+	// START GAME
+	//------------------------------------------------------
 	useEffect(() => {
-		setTimeout(() => setGameState('playing'), 2000)
+		function handleFirstInput() {
+			bossThemeSound.current.currentTime = 0
+			bossThemeSound.current.loop = true
+			bossThemeSound.current.volume = 0.2
+			bossThemeSound.current.play()
+
+			setShowBoss(true)
+			setTimeout(() => setGameState('playing'), 2000)
+
+			window.removeEventListener('keydown', handleFirstInput)
+		}
+
+		window.addEventListener('keydown', handleFirstInput)
+		return () => window.removeEventListener('keydown', handleFirstInput)
 	}, [])
 
+	//------------------------------------------------------
+	// NEW WORD ON SUCCESS/FAIL
+	//------------------------------------------------------
 	useEffect(() => {
-		if (gameState !== 'playing') {
-			if (timerRef.current) clearTimeout(timerRef.current)
-			if (intervalRef.current) clearInterval(intervalRef.current)
-			setWord(null)
-			setTimer(0)
-			setTimeRemaining(0)
-			setWordState(null)
-			return
-		}
-		if (timerRef.current) clearTimeout(timerRef.current)
-		if (intervalRef.current) clearInterval(intervalRef.current)
+		if (gameState !== 'playing') return
 
 		const newWord = getRandomWord()
-		const timeToType = baseTime + newWord.length * timePerLetter
-
 		setWord(newWord)
-		setTimer(timeToType)
-		setTimeRemaining(timeToType)
+
+		const time = baseTime + newWord.length * timePerLetter
+		setTimeToType(time)
+
 		setWordState('typing')
-
-		timerEndRef.current = Date.now() + timeToType + delayBetweenWords
-
-		const delayTimeout = setTimeout(() => {
-			intervalRef.current = setInterval(() => {
-				const remaining = timerEndRef.current - Date.now()
-				if (remaining <= 0) {
-					clearInterval(intervalRef.current!)
-					setWordState('fail')
-					setTimeRemaining(0)
-					return
-				}
-				setTimeRemaining(remaining)
-			}, 100)
-
-			timerRef.current = setTimeout(() => {
-				setWordState('fail')
-			}, timeToType)
-		}, delayBetweenWords)
-
-		return () => {
-			clearTimeout(delayTimeout)
-			if (timerRef.current) clearTimeout(timerRef.current)
-			if (intervalRef.current) clearInterval(intervalRef.current)
-		}
 	}, [wordState, gameState])
 
 	return (
-		<div className={styles.gameContainer}>
+		<div className={styles.container}>
 			<div className={styles.background}></div>
 
-			<Boss hit={hit || bossHealth === 0} />
-			<WordDisplay
-				word={word}
-				timerPercent={(timeRemaining / timer) * 100}
-				setWordState={handleSetWordState}
-				wordState={wordState}
-				handleTypo={handleTypo}
-			/>
+			<div className={styles.topUI}>
+				<PlayerStats burns={burnStatus} health={playerHealth} damage={damagePlayer} />
+			</div>
+
+			<div className={styles.gameContainer}>
+				{gameState === 'starting' && !showBoss && (
+					<div className={`${styles.startText} creepster`}>Press any key to start</div>
+				)}
+
+				{showBoss && <Boss hit={hit || bossHealth === 0} />}
+
+				{gameState !== 'starting' && (
+					<WordDisplay
+						key={word}
+						word={word}
+						timeToType={timeToType}
+						delayBetweenWords={delayBetweenWords}
+						wordState={wordState}
+						setWordState={handleSetWordState}
+						handleTypo={handleTypo}
+						keyPress={handleKeyPress}
+					/>
+				)}
+			</div>
+
 			<UiBottom bossHealth={bossHealth} damage={damage} />
 		</div>
 	)

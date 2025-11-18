@@ -1,62 +1,107 @@
 import { useEffect, useRef, useState } from 'react'
 import styles from './WordDisplay.module.css'
 
-interface props {
+interface Props {
 	word: string | null
-	timerPercent: number
-	wordState: string | null
+	timeToType: number
+	delayBetweenWords: number
+	wordState: 'typing' | 'success' | 'fail' | null
 	setWordState: (s: 'typing' | 'success' | 'fail' | null) => void
 	handleTypo: () => void
+	keyPress: () => void
 }
 
 export default function WordDisplay({
 	word,
-	timerPercent,
+	timeToType,
+	delayBetweenWords,
 	setWordState,
 	wordState,
 	handleTypo,
-}: props) {
-	if (word === null) return
-	const [i, setI] = useState(0)
-	const iRef = useRef(0)
+	keyPress,
+}: Props) {
+	if (!word) return null
+
+	const [timePercent, setTimePercent] = useState(100)
 
 	const letterRefs = useRef<(HTMLDivElement | null)[]>([])
+	const iRef = useRef(0)
+	const intervalRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const failTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const endTimeRef = useRef(0)
 
-	function handleKeyPress(char: string) {
-		if (!word) return
+	//------------------------------------------------------
+	// KEY PRESS HANDLING
+	//------------------------------------------------------
+	function onKey(char: string) {
+		const index = iRef.current
+		if (word[index] === char) {
+			keyPress()
+			letterRefs.current[index]?.classList.add(styles.typed)
 
-		const currentIndex = iRef.current
-
-		if (word[currentIndex] === char) {
-			letterRefs.current[currentIndex]?.classList.add(styles.typed)
-			iRef.current += 1
-			setI(iRef.current)
-
-			if (currentIndex + 1 >= word.length) setWordState('success')
+			iRef.current++
+			if (iRef.current >= word.length) {
+				stopTimers()
+				setWordState('success')
+			}
 		} else {
-			letterRefs.current[currentIndex]?.classList.add(styles.typo)
+			letterRefs.current[index]?.classList.add(styles.typo)
+			handleTypo()
 		}
 	}
 
 	useEffect(() => {
 		iRef.current = 0
-		setI(0)
-		const handleKeyDown = (e: KeyboardEvent) => {
+		letterRefs.current = []
+		const handler = (e: KeyboardEvent) => {
 			if (/^[a-zA-Z]$/.test(e.key)) {
-				handleKeyPress(e.key.toLowerCase())
+				onKey(e.key.toLowerCase())
 			}
 		}
 
-		window.addEventListener('keydown', handleKeyDown)
-		return () => window.removeEventListener('keydown', handleKeyDown)
+		window.addEventListener('keydown', handler)
+		return () => window.removeEventListener('keydown', handler)
 	}, [word])
 
-	if (timerPercent === 0) {
-		setWordState('fail')
+	//------------------------------------------------------
+	// TIMER LOGIC
+	//------------------------------------------------------
+	function stopTimers() {
+		if (intervalRef.current) clearInterval(intervalRef.current)
+		if (failTimeoutRef.current) clearTimeout(failTimeoutRef.current)
 	}
+
+	useEffect(() => {
+		stopTimers()
+
+		// Calculate when typing should finish
+		endTimeRef.current = Date.now() + timeToType
+
+		// Bar update every 100ms
+		intervalRef.current = setInterval(() => {
+			const remaining = endTimeRef.current - Date.now()
+			if (remaining <= 0) {
+				stopTimers()
+				setTimePercent(0)
+				setWordState('fail')
+				return
+			}
+			setTimePercent((remaining / timeToType) * 100)
+		}, 100)
+
+		// Hard fail after typing time
+		failTimeoutRef.current = setTimeout(() => {
+			stopTimers()
+			setTimePercent(0)
+			setWordState('fail')
+		}, timeToType)
+
+		return () => stopTimers()
+	}, [word])
+
 	return (
-		<div className={`${styles.container}`}>
-			<div key={word} className={`${styles.word} ${wordState === 'failed' ? styles.failed : ''}`}>
+		<div key={word} className={styles.container}>
+			<div className={styles.word}>
 				{word.split('').map((char, index) => (
 					<div
 						ref={(el) => (letterRefs.current[index] = el)}
@@ -67,7 +112,9 @@ export default function WordDisplay({
 					</div>
 				))}
 			</div>
-			<div className={`${styles.timer}`} style={{ width: `${timerPercent}%` }}></div>
+
+			{/* Timer bar */}
+			<div className={styles.timer} style={{ width: `${timePercent}%` }}></div>
 		</div>
 	)
 }

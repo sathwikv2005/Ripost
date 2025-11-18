@@ -1,0 +1,64 @@
+.container {
+	padding: 20px;
+	margin-top: 2vh;
+	justify-self: flex-start;
+	align-self: flex-start;
+}
+
+.health_bar {
+	height: 10px;
+	width: 60vw;
+	max-width: 400px;
+	display: flex;
+	border: 2px solid var(--red-dark);
+	flex-direction: row;
+	background-color: var(--primary);
+}
+
+.health {
+	height: 100%;
+	width: 100%;
+	background-color: var(--health-red);
+}
+
+.damage {
+	transition: all 0.5s ease-in;
+	background-color: var(--orange);
+	height: 100%;
+}
+
+.title {
+	font-size: 24px;
+	margin-left: 8px;
+}
+
+.flexBox {
+	display: flex;
+	flex-direction: row;
+	width: auto;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.statusBox {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.icon {
+	height: 28px;
+}
+
+.times {
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+	height: 100%;
+	font-size: 18px;
+}
+
+.times > span {
+	font-size: 12px;
+	padding-right: 1px;
+}
