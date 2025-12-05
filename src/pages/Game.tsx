@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { FaVolumeHigh, FaVolumeXmark } from 'react-icons/fa6'
 import styles from './Game.module.css'
 import words from '../../words/words_9k.json'
 
@@ -47,6 +48,9 @@ export default function Game() {
 	//------------------------------------------------------
 	// SOUND
 	//------------------------------------------------------
+	const [muted, setMuted] = useState(() => {
+		return localStorage.getItem('muted') === 'true'
+	})
 	const bossHitSound = useRef(new Audio(bosshit))
 	const bossThemeSound = useRef(new Audio(bossTheme))
 	const keyPressSound = useRef(new Audio(keyPress))
@@ -77,6 +81,26 @@ export default function Game() {
 		damageTakenSound.current.currentTime = 0
 		damageTakenSound.current.volume = 0.3
 		damageTakenSound.current.play()
+	}
+
+	function addBurnStatus(rounds: number = burnStatusRounds) {
+		setBurnStatus((b) => b + rounds)
+	}
+
+	function handleMute() {
+		setMuted((prev) => {
+			localStorage.setItem('muted', (!prev).toString())
+			if (!prev) bossThemeSound.current.pause()
+			else playBossTheme()
+			return !prev
+		})
+	}
+
+	function playBossTheme() {
+		bossThemeSound.current.currentTime = 0
+		bossThemeSound.current.loop = true
+		bossThemeSound.current.volume = 0.2
+		bossThemeSound.current.play()
 	}
 
 	//------------------------------------------------------
@@ -148,19 +172,12 @@ export default function Game() {
 		setWordState(state)
 	}
 
-	function addBurnStatus(rounds: number = burnStatusRounds) {
-		setBurnStatus((b) => b + rounds)
-	}
-
 	//------------------------------------------------------
 	// START GAME
 	//------------------------------------------------------
 	useEffect(() => {
 		function handleFirstInput() {
-			bossThemeSound.current.currentTime = 0
-			bossThemeSound.current.loop = true
-			bossThemeSound.current.volume = 0.2
-			bossThemeSound.current.play()
+			if (!muted) playBossTheme()
 
 			setShowBoss(true)
 			setTimeout(() => setGameState('playing'), 2000)
@@ -193,6 +210,16 @@ export default function Game() {
 
 			<div className={styles.topUI}>
 				<PlayerStats burns={burnStatus} health={playerHealth} damage={damagePlayer} />
+				<div className={styles.topUI_right}>
+					{!muted ? (
+						<FaVolumeHigh onClick={handleMute} className={styles.topUI_icon} />
+					) : (
+						<FaVolumeXmark
+							onClick={handleMute}
+							className={`${styles.topUI_icon} ${styles.topUI_icon_muted}`}
+						/>
+					)}
+				</div>
 			</div>
 
 			<div className={styles.gameContainer}>

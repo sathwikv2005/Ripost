@@ -34,6 +34,28 @@
 	height: 10%;
 	position: relative;
 	z-index: 5;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.topUI_right {
+	margin-right: 30px;
+}
+
+.topUI_icon {
+	font-size: 24px;
+	color: var(--green);
+}
+
+.topUI_icon:hover {
+	cursor: pointer;
+	transform: scale(1.1);
+}
+
+.topUI_icon_muted {
+	color: var(--red-dark);
 }
 
 .startText {
