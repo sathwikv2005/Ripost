@@ -13,33 +13,48 @@ export default function Guide() {
 							<div className={styles.section}>
 								<h2>Welcome to RIPOST!</h2>
 								<p>
-									Welcome, challenger! You are about to enter the world of <strong>RIPOST</strong>,
-									a retro-styled typing battle game where words are your weapons.
+									Welcome, challenger! You are about to enter the world of <strong>RIPOST</strong> —
+									a fast-paced retro typing battle where{' '}
+									<strong>your words become your parries</strong>.
 								</p>
 								<p>
-									Face off against the mighty boss who attacks by spitting out words. Your mission
-									is simple: type the words correctly and quickly to parry incoming attacks!
+									The boss launches attacks in the form of words. Your goal is to{' '}
+									<strong>parry </strong>
+									each incoming word by typing it correctly before the timer runs out.
 								</p>
 								<p>
-									The faster and more accurate you type, the more damage you deal—and the less
-									damage you take. Are your fingers ready for action?
+									Perfect parries deal damage to the boss. Failed or slow parries will cause
+									<strong>burn damage</strong> to you — so stay focused, stay fast, and stay sharp.
 								</p>
 								<p className={styles.tip}>
-									Tip: Keep your fingers on the home row and focus on one word at a time!
+									Tip: Keep calm and type with rhythm. Panic is the real enemy.
 								</p>
 							</div>
 
 							<div className={styles.section}>
 								<h2>How to Play</h2>
 								<ul>
-									<li>Watch the words the boss spits out.</li>
-									<li>Type each word correctly before it reaches you.</li>
-									<li>Mistyped words will cause damage!</li>
-									<li>Completing words quickly increases your combo multiplier.</li>
+									<li>The boss spits out a word — the attack has begun.</li>
+									<li>Type the entire word correctly within the time limit to parry it.</li>
+									<li>
+										If you succeed, the boss takes{' '}
+										<strong>damage equal to the length of the word</strong>.
+									</li>
+									<li>
+										If you fail or run out of time, you take <strong>15 burn damage</strong>.
+									</li>
+									<li>
+										After every word (success or fail), you gain <strong>2 Burn Stacks</strong>.
+									</li>
+									<li>
+										Only <strong>1 burn</strong> is consumed per word, dealing{' '}
+										<strong>5 bonus burn damage</strong>.
+									</li>
 								</ul>
+
 								<p className={styles.powerup}>
-									Power-up Words: Certain words give you shields, extra points, or special
-									abilities. Type them perfectly to gain an edge.
+									Mechanic Insight: Burn damage stacks over time — stay accurate to minimize life
+									loss.
 								</p>
 							</div>
 						</div>
@@ -52,39 +67,42 @@ export default function Guide() {
 							<div className={styles.pageNumber}>Page 2</div>
 
 							<div className={styles.section}>
-								<h2>Difficulty Levels</h2>
+								<h2>Health & Victory Conditions</h2>
 								<p>
-									RIPOST adjusts the challenge to your typing speed. Start easy and move up to
-									harder levels as your skills improve.
+									You start with <strong>100 Health</strong>. The boss also has{' '}
+									<strong>100 Health</strong>.
 								</p>
 								<ul>
 									<li>
-										<strong>Easy:</strong> Slow word attacks, simple words.
+										<strong>You win</strong> when the boss’s health reaches 0.
 									</li>
 									<li>
-										<strong>Medium:</strong> Moderate speed, mix of common and tricky words.
+										<strong>You lose</strong> if your health reaches 0.
 									</li>
 									<li>
-										<strong>Hard:</strong> Fast attacks, longer and complex words.
+										Strong parries (longer words) deal more damage — use them to shred the boss
+										fast.
 									</li>
-									<li>
-										<strong>Expert:</strong> Lightning-fast attacks, random and challenging words.
-									</li>
+									<li>Mistakes quickly snowball due to burn stacks — accuracy is survival.</li>
 								</ul>
 								<p className={styles.protip}>
-									Pro Tip: Practice makes perfect—keep typing to climb the ranks and survive longer
-									battles!
+									Pro Tip: The real battle isn’t speed — it’s consistency. Play steady, not
+									reckless.
 								</p>
 							</div>
 
 							<div className={styles.section}>
-								<h2>Tips & Tricks</h2>
-								<p>- Focus on rhythm: Type steadily rather than rushing one word at a time.</p>
-								<p>- Use all fingers: Avoid hunting and pecking; train your touch typing.</p>
-								<p>- Take breaks: Stay sharp to maintain speed and accuracy.</p>
+								<h2>Tips & Strategy</h2>
+								<p>
+									- Focus on one clean parry at a time. Don't look at your health bar mid-fight.
+								</p>
+								<p>- Longer words = more boss damage. Treat them like power moves.</p>
+								<p>- Burn stacks are inevitable — minimize failures to keep damage manageable.</p>
+								<p>- Keep your typing steady and rely on rhythm instead of brute force speed.</p>
+
 								<p className={styles.reminder}>
-									Remember: Your keyboard is your weapon. Sharpen your skills and defeat the boss in
-									style!
+									Remember: Every word is a duel. Parry cleanly, survive the burn, and defeat the
+									boss.
 								</p>
 							</div>
 						</div>
