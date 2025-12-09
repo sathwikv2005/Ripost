@@ -73,30 +73,34 @@ export default function WordDisplay({
 
 	useEffect(() => {
 		stopTimers()
+		setTimePercent(100) // reset bar
 
-		// Calculate when typing should finish
-		endTimeRef.current = Date.now() + timeToType
+		// Delay before the timer starts
+		const startTimerTimeout = setTimeout(() => {
+			endTimeRef.current = Date.now() + timeToType
 
-		// Bar update every 100ms
-		intervalRef.current = setInterval(() => {
-			const remaining = endTimeRef.current - Date.now()
-			if (remaining <= 0) {
+			intervalRef.current = setInterval(() => {
+				const remaining = endTimeRef.current - Date.now()
+				if (remaining <= 0) {
+					stopTimers()
+					setTimePercent(0)
+					setWordState('fail')
+					return
+				}
+				setTimePercent((remaining / timeToType) * 100)
+			}, 100)
+
+			failTimeoutRef.current = setTimeout(() => {
 				stopTimers()
 				setTimePercent(0)
 				setWordState('fail')
-				return
-			}
-			setTimePercent((remaining / timeToType) * 100)
-		}, 100)
+			}, timeToType)
+		}, delayBetweenWords)
 
-		// Hard fail after typing time
-		failTimeoutRef.current = setTimeout(() => {
+		return () => {
+			clearTimeout(startTimerTimeout)
 			stopTimers()
-			setTimePercent(0)
-			setWordState('fail')
-		}, timeToType)
-
-		return () => stopTimers()
+		}
 	}, [word])
 
 	return (
