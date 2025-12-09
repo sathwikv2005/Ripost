@@ -14,13 +14,35 @@ import wrong from '../assets/sfx/wrong.mp3'
 import keyPress from '../assets/sfx/keypress.mp3'
 import damageTaken from '../assets/sfx/damagetaken.mp3'
 
+interface statsInterface {
+	totalWords: number
+	missedWords: number
+	correctWords: number
+	damageDelt: number
+	longestCombo: number
+	damageRecieved: number
+	gameStartTime: number
+	higestBurnStack: number
+}
+
+const defaultStats: statsInterface = {
+	totalWords: 0,
+	missedWords: 0,
+	correctWords: 0,
+	damageDelt: 0,
+	longestCombo: 0,
+	damageRecieved: 0,
+	gameStartTime: 0,
+	higestBurnStack: 0,
+}
+
 export default function Game() {
 	//------------------------------------------------------
 	// CONSTANTS
 	//------------------------------------------------------
 	const baseTime = 1000
 	const timePerLetter = 500
-	const delayBetweenWords = 800
+	const delayBetweenWords = 500
 	const burnStatusRounds = 2
 	const damageFromFire = 15
 	const damageFromBurns = 5
@@ -28,6 +50,9 @@ export default function Game() {
 	//------------------------------------------------------
 	// GAME STATE
 	//------------------------------------------------------
+	const [winStatus, setWinStatus] = useState<boolean>(false)
+	const [stats, setStats] = useState<statsInterface>(defaultStats)
+
 	const [bossHealth, setBossHealth] = useState(100)
 	const [playerHealth, setPlayerHealth] = useState(100)
 	const [damage, setDamage] = useState(0)
@@ -103,6 +128,10 @@ export default function Game() {
 		bossThemeSound.current.play()
 	}
 
+	function updateStats(partial: Partial<statsInterface>) {
+		setStats((s) => ({ ...s, ...partial }))
+	}
+
 	//------------------------------------------------------
 	// BOSS DAMAGE
 	//------------------------------------------------------
@@ -126,7 +155,7 @@ export default function Game() {
 			}, 1000)
 		}
 		setHit(true)
-
+		updateStats({ damageDelt: stats.damageDelt + value })
 		setTimeout(() => setDamage((d) => d - value), 2000)
 	}
 
@@ -137,16 +166,30 @@ export default function Game() {
 
 	function handleSetWordState(state: 'typing' | 'success' | 'fail' | null) {
 		if (word && state === 'success') {
-			setComboStatus((c) => c + 1)
+			setComboStatus((c) => {
+				updateStats({
+					longestCombo: Math.max(stats.longestCombo, c + 1),
+					correctWords: stats.correctWords + 1,
+					totalWords: stats.totalWords + 1,
+				})
+
+				return c + 1
+			})
 
 			if (burnStatus > 0) {
 				playDamageTaken()
-				setPlayerHealth((h) => Math.max(h - damageFromBurns, 0))
+				setPlayerHealth((h) => {
+					if (h - damageFromBurns <= 0) setGameState('complete')
+					return Math.max(h - damageFromBurns, 0)
+				})
 
 				setDamagePlayer((d) => d + damageFromBurns)
 				setTimeout(() => setDamagePlayer((d) => d - damageFromBurns), 2000)
 
 				setBurnStatus((b) => b - 1)
+				updateStats({
+					damageRecieved: stats.damageRecieved + damageFromBurns,
+				})
 			}
 
 			bossDamage(word.length)
@@ -160,9 +203,18 @@ export default function Game() {
 				setBurnStatus((b) => b - 1)
 			}
 
-			setPlayerHealth((h) => Math.max(h - total, 0))
+			setPlayerHealth((h) => {
+				if (h - total <= 0) setGameState('complete')
+				return Math.max(h - total, 0)
+			})
 			setDamagePlayer((d) => d + total)
 			setTimeout(() => setDamagePlayer((d) => d - total), 2000)
+
+			updateStats({
+				missedWords: stats.missedWords + 1,
+				damageRecieved: stats.damageRecieved + total,
+				totalWords: stats.totalWords + 1,
+			})
 
 			playDamageTaken()
 			addBurnStatus()
@@ -173,11 +225,32 @@ export default function Game() {
 	}
 
 	//------------------------------------------------------
+	// Game state handling
+	//------------------------------------------------------
+
+	useEffect(() => {
+		if (gameState === 'complete') {
+			bossThemeSound.current.pause()
+
+			console.log(stats)
+
+			const didWin = bossHealth <= 0
+
+			if (didWin) {
+				setWinStatus(true)
+				alert('you won!')
+			} else alert('you lost')
+		}
+	}, [gameState])
+
+	//------------------------------------------------------
 	// START GAME
 	//------------------------------------------------------
 	useEffect(() => {
 		function handleFirstInput() {
 			if (!muted) playBossTheme()
+
+			updateStats({ gameStartTime: Date.now() })
 
 			setShowBoss(true)
 			setTimeout(() => setGameState('playing'), 2000)
@@ -194,9 +267,11 @@ export default function Game() {
 	//------------------------------------------------------
 	useEffect(() => {
 		if (gameState !== 'playing') return
-
+		console.log(stats)
 		const newWord = getRandomWord()
 		setWord(newWord)
+
+		updateStats({ higestBurnStack: Math.max(stats.higestBurnStack, burnStatus) })
 
 		const time = baseTime + newWord.length * timePerLetter
 		setTimeToType(time)
