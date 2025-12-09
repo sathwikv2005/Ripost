@@ -5,7 +5,6 @@ interface Props {
 	word: string | null
 	timeToType: number
 	delayBetweenWords: number
-	wordState: 'typing' | 'success' | 'fail' | null
 	setWordState: (s: 'typing' | 'success' | 'fail' | null) => void
 	handleTypo: () => void
 	keyPress: () => void
@@ -16,7 +15,6 @@ export default function WordDisplay({
 	timeToType,
 	delayBetweenWords,
 	setWordState,
-	wordState,
 	handleTypo,
 	keyPress,
 }: Props) {
@@ -108,7 +106,9 @@ export default function WordDisplay({
 			<div className={styles.word}>
 				{word.split('').map((char, index) => (
 					<div
-						ref={(el) => (letterRefs.current[index] = el)}
+						ref={(el) => {
+							letterRefs.current[index] = el
+						}}
 						key={index}
 						className={`creepster ${styles.letter}`}
 					>

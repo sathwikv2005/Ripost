@@ -191,7 +191,7 @@ export default function Game() {
 		if (word && state === 'success') {
 			setComboStatus((c) => {
 				updateStats({
-					longestCombo: Math.max(stats.longestCombo, c + 1),
+					longestCombo: Math.max(stats.longestCombo, comboStatus + 1),
 					correctWords: stats.correctWords + 1,
 					totalWords: stats.totalWords + 1,
 				})
@@ -335,7 +335,6 @@ export default function Game() {
 						word={word}
 						timeToType={timeToType}
 						delayBetweenWords={delayBetweenWords}
-						wordState={wordState}
 						setWordState={handleSetWordState}
 						handleTypo={handleTypo}
 						keyPress={handleKeyPress}
