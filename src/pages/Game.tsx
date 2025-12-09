@@ -230,6 +230,7 @@ export default function Game() {
 
 	useEffect(() => {
 		if (gameState === 'complete') {
+			setWord(null)
 			bossThemeSound.current.pause()
 
 			console.log(stats)

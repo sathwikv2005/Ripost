@@ -35,7 +35,7 @@ export default function WordDisplay({
 	//------------------------------------------------------
 	function onKey(char: string) {
 		const index = iRef.current
-		if (word[index] === char) {
+		if (word && word[index] === char) {
 			keyPress()
 			letterRefs.current[index]?.classList.add(styles.typed)
 
