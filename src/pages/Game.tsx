@@ -14,18 +14,10 @@ import wrong from '../assets/sfx/wrong.mp3'
 import keyPress from '../assets/sfx/keypress.mp3'
 import damageTaken from '../assets/sfx/damagetaken.mp3'
 
-interface statsInterface {
-	totalWords: number
-	missedWords: number
-	correctWords: number
-	damageDelt: number
-	longestCombo: number
-	damageRecieved: number
-	gameStartTime: number
-	higestBurnStack: number
-}
+import type { StatsInterface } from '../types/stats'
+import GameOver from '../components/game/GameOver'
 
-const defaultStats: statsInterface = {
+const defaultStats: StatsInterface = {
 	totalWords: 0,
 	missedWords: 0,
 	correctWords: 0,
@@ -33,6 +25,7 @@ const defaultStats: statsInterface = {
 	longestCombo: 0,
 	damageRecieved: 0,
 	gameStartTime: 0,
+	gameEndTime: 0,
 	higestBurnStack: 0,
 }
 
@@ -51,7 +44,7 @@ export default function Game() {
 	// GAME STATE
 	//------------------------------------------------------
 	const [winStatus, setWinStatus] = useState<boolean>(false)
-	const [stats, setStats] = useState<statsInterface>(defaultStats)
+	const [stats, setStats] = useState<StatsInterface>(defaultStats)
 
 	const [bossHealth, setBossHealth] = useState(100)
 	const [playerHealth, setPlayerHealth] = useState(100)
@@ -128,8 +121,38 @@ export default function Game() {
 		bossThemeSound.current.play()
 	}
 
-	function updateStats(partial: Partial<statsInterface>) {
+	function updateStats(partial: Partial<StatsInterface>) {
 		setStats((s) => ({ ...s, ...partial }))
+	}
+
+	function resetGame() {
+		// Reset stats
+		setStats({ ...defaultStats, gameStartTime: 0 })
+
+		// Reset health
+		setBossHealth(100)
+		setPlayerHealth(100)
+
+		// Reset damage
+		setDamage(0)
+		setDamagePlayer(0)
+
+		// Reset word-related
+		setWord(null)
+		setWordState(null)
+		setTimeToType(0)
+
+		// Reset status
+		setBurnStatus(0)
+		setComboStatus(0)
+		setHit(false)
+
+		// Reset flags
+		setShowBoss(false)
+		setWinStatus(false)
+
+		//
+		setGameState('starting')
 	}
 
 	//------------------------------------------------------
@@ -232,15 +255,13 @@ export default function Game() {
 		if (gameState === 'complete') {
 			setWord(null)
 			bossThemeSound.current.pause()
-
-			console.log(stats)
+			updateStats({ gameEndTime: Date.now() })
 
 			const didWin = bossHealth <= 0
 
 			if (didWin) {
 				setWinStatus(true)
-				alert('you won!')
-			} else alert('you lost')
+			}
 		}
 	}, [gameState])
 
@@ -248,10 +269,11 @@ export default function Game() {
 	// START GAME
 	//------------------------------------------------------
 	useEffect(() => {
+		if (gameState !== 'starting') return
 		function handleFirstInput() {
 			if (!muted) playBossTheme()
 
-			updateStats({ gameStartTime: Date.now() })
+			updateStats({ ...defaultStats, gameStartTime: Date.now() })
 
 			setShowBoss(true)
 			setTimeout(() => setGameState('playing'), 2000)
@@ -261,7 +283,7 @@ export default function Game() {
 
 		window.addEventListener('keydown', handleFirstInput)
 		return () => window.removeEventListener('keydown', handleFirstInput)
-	}, [])
+	}, [gameState])
 
 	//------------------------------------------------------
 	// NEW WORD ON SUCCESS/FAIL
@@ -283,7 +305,9 @@ export default function Game() {
 	return (
 		<div className={styles.container}>
 			<div className={styles.background}></div>
-
+			{gameState === 'complete' && (
+				<GameOver stats={stats} winStatus={winStatus} resetGame={resetGame} />
+			)}
 			<div className={styles.topUI}>
 				<PlayerStats burns={burnStatus} health={playerHealth} damage={damagePlayer} />
 				<div className={styles.topUI_right}>
