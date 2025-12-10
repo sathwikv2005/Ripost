@@ -24,7 +24,7 @@ export default function Guide() {
 								</p>
 								<p>
 									Perfect parries deal damage to the boss. Failed or slow parries will cause
-									<strong>burn damage</strong> to you — so stay focused, stay fast, and stay sharp.
+									<strong> burn damage</strong> to you — so stay focused, stay fast, and stay sharp.
 								</p>
 								<p className={styles.tip}>
 									Tip: Keep calm and type with rhythm. Panic is the real enemy.
